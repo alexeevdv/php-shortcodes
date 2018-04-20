@@ -30,6 +30,24 @@ class WordpressMatcherTest extends \Codeception\Test\Unit
 
     /**
      * @test
+     * @dataProvider matchProvider
+     * @param string $content
+     * @param integer $expectedMatches
+     */
+    public function matchAndNotReplace($content, $expectedMatches)
+    {
+        $matcher = new WordpressMatcher;
+        $output = $matcher->match($content,
+            function (IShortcode $shortcode) {
+                return false;
+            }
+        );
+        $this->assertEquals($content, $output);
+    }
+
+
+    /**
+     * @test
      * @dataProvider attributesProvider
      * @param string $content
      * @param array $expectedAttributes

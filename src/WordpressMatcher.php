@@ -23,7 +23,11 @@ class WordpressMatcher implements IMatcher
         foreach ( $textarr as &$element ) {
             if ( '' == $element || '<' !== $element[0] ) {
                 $element = preg_replace_callback( "/$regexp/", function ($match) use ($callback) {
-                    return call_user_func($callback, $this->buildShortcode($match));
+                    $result = call_user_func($callback, $this->buildShortcode($match));
+                    if ($result === false) {
+                        return $match[0];
+                    }
+                    return $result;
                 }, $element );
             }
         }
