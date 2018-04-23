@@ -75,6 +75,20 @@ class WordpressMatcherTest extends \Codeception\Test\Unit
     }
 
     /**
+     * @test
+     */
+    public function parseContentWichContainsHtml()
+    {
+        $matcher = new  WordpressMatcher;
+
+        $content = null;
+        $matcher->match('[banner]<h3>Header</h3>[/banner]', function (IShortcode $shortcode) use (&$content) {
+            $content = $shortcode->getContent();
+        });
+        $this->assertEquals('<h3>Header</h3>', $content);
+    }
+
+    /**
      * @return array
      */
     public function matchProvider()

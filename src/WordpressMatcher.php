@@ -18,7 +18,22 @@ class WordpressMatcher implements IMatcher
     {
         $regexp = $this->getShortCodesRegex($this->parseShortcodeNames($content));
 
+        // First replace all shortcodes that have closing tag (like [banner]content[/banner])
+        $content = preg_replace_callback( "/$regexp/", function ($match) use ($callback) {
+            if (empty($match[5])) {
+                return $match[0];
+            }
+            $result = call_user_func($callback, $this->buildShortcode($match));
+            if ($result === false) {
+                return $match[0];
+            }
+            return $result;
+        }, $content);
 
+
+        // Now replace all single shorcodes like [banner].
+        // Make sure we not changing anything inside HTML tag (like attribute)
+        // TODO find better solution to detect if content is HTML attribute or not
         $textarr = preg_split( $this->get_html_split_regex(), $content, -1, PREG_SPLIT_DELIM_CAPTURE );
         foreach ( $textarr as &$element ) {
             if ( '' == $element || '<' !== $element[0] ) {
